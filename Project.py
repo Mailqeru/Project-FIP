@@ -1,4 +1,4 @@
-import cv2  # ✅ FIXED: was 'cvw'
+import cv2
 import numpy as np
 import tkinter as tk
 from tkinter import filedialog, ttk, messagebox
@@ -11,7 +11,7 @@ from matplotlib.figure import Figure
 class ImageEditor:
     def __init__(self, root):
         self.root = root
-        self.root.title("OpenCV Image Editor")
+        self.root.title("SCSV3213 - Image Editor")
         self.root.geometry("1200x880")
         
         # Image storage
@@ -31,7 +31,6 @@ class ImageEditor:
         self.setup_ui()
         
     def setup_ui(self):
-        # Configure root window
         self.root.configure(bg='#2b2b2b')
         
         # Menu Bar
@@ -39,7 +38,6 @@ class ImageEditor:
                          activebackground='#404040', activeforeground='white')
         self.root.config(menu=menubar)
         
-        # File Menu
         file_menu = tk.Menu(menubar, tearoff=0, bg='#2b2b2b', fg='white',
                            activebackground='#404040', activeforeground='white')
         menubar.add_cascade(label="📁 File", menu=file_menu)
@@ -48,7 +46,6 @@ class ImageEditor:
         file_menu.add_separator()
         file_menu.add_command(label="❌  Exit", command=self.root.quit)
         
-        # Edit Menu
         edit_menu = tk.Menu(menubar, tearoff=0, bg='#2b2b2b', fg='white',
                            activebackground='#404040', activeforeground='white')
         menubar.add_cascade(label="✏️ Edit", menu=edit_menu)
@@ -81,7 +78,6 @@ class ImageEditor:
         
         tk.Frame(toolbar, bg='#555555', width=2).pack(side=tk.LEFT, fill=tk.Y, padx=10, pady=10)
         
-        # Selection tools
         self.selection_btn = tk.Button(toolbar, text="🔲 Select Area", 
                                        command=self.toggle_selection_mode, 
                                        **btn_style)
@@ -92,49 +88,42 @@ class ImageEditor:
         
         tk.Frame(toolbar, bg='#555555', width=2).pack(side=tk.LEFT, fill=tk.Y, padx=10, pady=10)
         
-        # Image info label
         self.img_info_label = tk.Label(toolbar, text="No image loaded", 
                                        bg='#3c3c3c', fg='#aaaaaa', 
                                        font=('Arial', 9))
         self.img_info_label.pack(side=tk.LEFT, padx=15)
         
-        # Selection info label
         self.selection_info_label = tk.Label(toolbar, text="", 
                                              bg='#3c3c3c', fg='#00ff00', 
                                              font=('Arial', 9, 'bold'))
         self.selection_info_label.pack(side=tk.LEFT, padx=10)
         
-        # Main Frame Layout
+        # Main Frame
         main_frame = tk.Frame(self.root, bg='#2b2b2b')
         main_frame.pack(fill=tk.BOTH, expand=True, padx=0, pady=0)
         
-        # Left Panel - Tools
-        left_panel = tk.Frame(main_frame, width=280, bg='#353535', 
-                             relief=tk.FLAT, borderwidth=0)
+        # Left Panel
+        left_panel = tk.Frame(main_frame, width=280, bg='#353535', relief=tk.FLAT, borderwidth=0)
         left_panel.pack(side=tk.LEFT, fill=tk.Y, padx=0)
         left_panel.pack_propagate(False)
         
-        # Tools Header
         header_frame = tk.Frame(left_panel, bg='#2b2b2b', height=50)
         header_frame.pack(fill=tk.X)
         header_frame.pack_propagate(False)
-        
         tk.Label(header_frame, text="🎨 Tools & Effects", 
                 font=("Segoe UI", 14, "bold"), bg='#2b2b2b', fg='white').pack(pady=15)
         
-        # Create custom style for Notebook — FIXED TABS
+        # Notebook Style
         style = ttk.Style()
         style.theme_create("dark", parent="alt", settings={
-            "TNotebook": {
-                "configure": {"background": "#353535", "borderwidth": 0}
-            },
+            "TNotebook": {"configure": {"background": "#353535", "borderwidth": 0}},
             "TNotebook.Tab": {
                 "configure": {
                     "background": "#2b2b2b",
                     "foreground": "#aaaaaa",
-                    "padding": [12, 8],      # ← More padding
+                    "padding": [12, 8],
                     "font": ('Segoe UI', 9, 'bold'),
-                    "width": 15,              # ← Wider tabs
+                    "width": 15,
                 },
                 "map": {
                     "background": [("selected", "#4a90e2")],
@@ -145,58 +134,67 @@ class ImageEditor:
         })
         style.theme_use("dark")
         
-        # Create Notebook
         notebook = ttk.Notebook(left_panel)
         notebook.pack(fill=tk.BOTH, expand=True, padx=0, pady=0)
         
-        # Filters Tab — FULL TEXT
+        # Existing Tabs
         filters_frame = tk.Frame(notebook, bg='#353535')
-        notebook.add(filters_frame, text="Filters")  # ← No icon, full word
+        notebook.add(filters_frame, text="Filters")
         self.create_filters_panel(filters_frame)
         
-        # Adjustments Tab — FULL TEXT
         adjustments_frame = tk.Frame(notebook, bg='#353535')
         notebook.add(adjustments_frame, text="Adjustments")
         self.create_adjustments_panel(adjustments_frame)
         
-        # Edge Tab — FULL TEXT
         edge_frame = tk.Frame(notebook, bg='#353535')
         notebook.add(edge_frame, text="Edge Detection")
         self.create_edge_panel(edge_frame)
         
-        # Threshold Tab — FULL TEXT
         thresh_frame = tk.Frame(notebook, bg='#353535')
         notebook.add(thresh_frame, text="Thresholding")
         self.create_threshold_panel(thresh_frame)
         
-        # Logic Tab — FULL TEXT
         logic_frame = tk.Frame(notebook, bg='#353535')
         notebook.add(logic_frame, text="Logic Operations")
         self.create_logic_panel(logic_frame)
         
-        # Right Panel - Image Display
+        # Halftoning Tab
+        halftone_frame = tk.Frame(notebook, bg='#353535')
+        notebook.add(halftone_frame, text="Halftoning")
+        self.create_halftoning_panel(halftone_frame)
+        
+        # Neighborhood Tab
+        nb_frame = tk.Frame(notebook, bg='#353535')
+        notebook.add(nb_frame, text="Neighborhood")
+        self.create_neighborhood_panel(nb_frame)
+        
+        # Frequency Domain Tab
+        freq_frame = tk.Frame(notebook, bg='#353535')
+        notebook.add(freq_frame, text="Frequency")
+        self.create_frequency_panel(freq_frame)
+        
+        # Segmentation Tab (NEW)
+        seg_frame = tk.Frame(notebook, bg='#353535')
+        notebook.add(seg_frame, text="Segmentation")
+        self.create_segmentation_panel(seg_frame)
+        
+        # Right Panel - Display
         right_panel = tk.Frame(main_frame, bg='#2b2b2b', relief=tk.FLAT)
         right_panel.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=10, pady=10)
         
-        # Canvas frame
         canvas_frame = tk.Frame(right_panel, bg='#1e1e1e', relief=tk.SUNKEN, borderwidth=1)
         canvas_frame.pack(fill=tk.BOTH, expand=True)
-        
-        # Canvas for image display
         self.canvas = tk.Canvas(canvas_frame, bg='#1e1e1e', highlightthickness=0)
         self.canvas.pack(fill=tk.BOTH, expand=True)
         
-        # Histogram Frame
+        # Histogram
         hist_frame = tk.Frame(right_panel, bg='#2b2b2b', height=140)
         hist_frame.pack(side=tk.BOTTOM, fill=tk.X, pady=(8, 0))
         hist_frame.pack_propagate(False)
-
         self.hist_fig = Figure(figsize=(6, 1.4), facecolor='#2b2b2b', dpi=100)
         self.hist_ax = self.hist_fig.add_subplot(111, facecolor='#3c3c3c')
-        self.hist_ax.spines['top'].set_color('#555555')
-        self.hist_ax.spines['bottom'].set_color('#555555')
-        self.hist_ax.spines['left'].set_color('#555555')
-        self.hist_ax.spines['right'].set_color('#555555')
+        for spine in self.hist_ax.spines.values():
+            spine.set_color('#555555')
         self.hist_ax.tick_params(colors='white', labelsize=8)
         self.hist_ax.set_xlim([0, 256])
         self.hist_ax.set_xticks([0, 64, 128, 192, 255])
@@ -205,13 +203,12 @@ class ImageEditor:
         self.hist_canvas_agg = FigureCanvasTkAgg(self.hist_fig, hist_frame)
         self.hist_canvas_agg.get_tk_widget().pack(fill=tk.BOTH, expand=True)
         
-        # Bind events
+        # Bind Canvas Events
         self.canvas.bind('<Configure>', lambda e: self.display_image())
         self.canvas.bind('<ButtonPress-1>', self.on_mouse_down)
         self.canvas.bind('<B1-Motion>', self.on_mouse_drag)
         self.canvas.bind('<ButtonRelease-1>', self.on_mouse_up)
         
-        # Placeholder text
         self.canvas.create_text(400, 250, 
                                text="📷\n\nOpen an image to start editing\n(File > Open Image)",
                                fill='#555555', font=('Segoe UI', 16), 
@@ -221,12 +218,11 @@ class ImageEditor:
         status_frame = tk.Frame(self.root, bg='#2b2b2b', height=30)
         status_frame.pack(side=tk.BOTTOM, fill=tk.X)
         status_frame.pack_propagate(False)
-        
         self.status_bar = tk.Label(status_frame, text="⚡ Ready  |  No image loaded", 
                                    bg='#2b2b2b', fg='#aaaaaa', 
                                    anchor=tk.W, font=('Segoe UI', 9), padx=10)
         self.status_bar.pack(fill=tk.X, pady=5)
-        
+    
     def create_section_header(self, parent, text):
         header_frame = tk.Frame(parent, bg='#2b2b2b', height=35)
         header_frame.pack(fill=tk.X, pady=(15, 10), padx=10)
@@ -241,6 +237,7 @@ class ImageEditor:
         tk.Label(header_frame, text=text, bg='#2b2b2b', fg='#ffcc00',
                  font=('Segoe UI', 10, 'bold')).pack(pady=6, padx=10, anchor=tk.W)
 
+    # ========== EXISTING PANELS ==========
     def create_filters_panel(self, parent):
         parent.configure(bg='#353535')
         container = tk.Frame(parent, bg='#353535')
@@ -324,7 +321,7 @@ class ImageEditor:
         self.create_section_header(container, "Otsu Threshold")
         thresh_btn_style = {'bg': '#2c3e50', 'fg': 'white', 'font': ('Segoe UI', 10),
                            'relief': tk.FLAT, 'cursor': 'hand2', 'activebackground': '#1a252f'}
-        tk.Button(container, text="Apply Otsu Threshold", command=self.apply_otsu_threshold,
+        tk.Button(container, text="RGBO: Otsu Threshold", command=self.apply_otsu_threshold,
                  width=22, **thresh_btn_style).pack(pady=5)
         tk.Label(container, text="Automatic binary segmentation\nBest threshold chosen by algorithm",
                  bg='#353535', fg='#bbbbbb', font=('Segoe UI', 8), justify=tk.CENTER).pack(pady=(10,0))
@@ -353,12 +350,200 @@ class ImageEditor:
         tk.Button(container, text="XOR", command=lambda: self.apply_logic_operation('XOR'),
                   width=22, **logic_btn_style).pack(pady=4)
 
+    # ========== HALFTONING ==========
+    def create_halftoning_panel(self, parent):
+        parent.configure(bg='#353535')
+        container = tk.Frame(parent, bg='#353535')
+        container.pack(fill=tk.BOTH, expand=True, padx=15, pady=15)
+        self.create_section_header(container, "Halftoning Methods")
+        self.halftone_method = tk.StringVar(value="patterning")
+        rb_style = {'bg': '#353535', 'fg': '#cccccc', 'selectcolor': '#2b2b2b',
+                    'font': ('Segoe UI', 10)}
+        tk.Radiobutton(container, text="Patterning (2×2, 5 levels)", 
+                       variable=self.halftone_method, value="patterning", **rb_style).pack(anchor=tk.W, pady=4)
+        tk.Radiobutton(container, text="Dithering (2×2 matrix D₁)", 
+                       variable=self.halftone_method, value="dithering", **rb_style).pack(anchor=tk.W, pady=4)
+        btn_style = {'bg': '#8e44ad', 'fg': 'white', 'font': ('Segoe UI', 10, 'bold'),
+                     'relief': tk.FLAT, 'cursor': 'hand2', 'activebackground': '#7d3c98'}
+        tk.Button(container, text="🎨 Apply Halftoning", 
+                  command=self.apply_halftoning,
+                  width=22, **btn_style).pack(pady=15)
+        tk.Label(container, text="Converts grayscale image\nto binary using halftoning",
+                 bg='#353535', fg='#bbbbbb', font=('Segoe UI', 8), justify=tk.CENTER).pack(pady=(0,10))
+
+    # ========== NEIGHBORHOOD ==========
+    def create_neighborhood_panel(self, parent):
+        parent.configure(bg='#353535')
+        container = tk.Frame(parent, bg='#353535')
+        container.pack(fill=tk.BOTH, expand=True, padx=15, pady=15)
+        
+        self.create_section_header(container, "Linear Filters")
+        
+        mean_frame = tk.Frame(container, bg='#353535')
+        mean_frame.pack(fill=tk.X, pady=5)
+        tk.Label(mean_frame, text="Mean (Box) Kernel:", bg='#353535', fg='#cccccc',
+                 font=('Segoe UI', 9)).pack(anchor=tk.W)
+        self.mean_kernel = tk.Scale(mean_frame, from_=3, to=31, orient=tk.HORIZONTAL,
+                                    resolution=2, bg='#353535', fg='#cccccc',
+                                    troughcolor='#2b2b2b', highlightthickness=0,
+                                    activebackground='#4a90e2', font=('Segoe UI', 8))
+        self.mean_kernel.set(5)
+        self.mean_kernel.pack(fill=tk.X)
+        tk.Button(container, text="Blur: Mean Filter", 
+                  command=self.apply_mean_filter,
+                  bg='#27ae60', fg='white', font=('Segoe UI', 10, 'bold'),
+                  relief=tk.FLAT, cursor='hand2', activebackground='#1e8449').pack(pady=6)
+
+        gauss_frame = tk.Frame(container, bg='#353535')
+        gauss_frame.pack(fill=tk.X, pady=10)
+        tk.Label(gauss_frame, text="Gaussian Kernel:", bg='#353535', fg='#cccccc',
+                 font=('Segoe UI', 9)).pack(anchor=tk.W)
+        self.gauss_kernel = tk.Scale(gauss_frame, from_=3, to=31, orient=tk.HORIZONTAL,
+                                     resolution=2, bg='#353535', fg='#cccccc',
+                                     troughcolor='#2b2b2b', highlightthickness=0,
+                                     activebackground='#4a90e2', font=('Segoe UI', 8))
+        self.gauss_kernel.set(5)
+        self.gauss_kernel.pack(fill=tk.X)
+        tk.Label(gauss_frame, text="Sigma (σ):", bg='#353535', fg='#cccccc',
+                 font=('Segoe UI', 9)).pack(anchor=tk.W, pady=(8,0))
+        self.gauss_sigma = tk.Scale(gauss_frame, from_=0.1, to=5.0, orient=tk.HORIZONTAL,
+                                    resolution=0.1, bg='#353535', fg='#cccccc',
+                                    troughcolor='#2b2b2b', highlightthickness=0,
+                                    activebackground='#4a90e2', font=('Segoe UI', 8))
+        self.gauss_sigma.set(1.0)
+        self.gauss_sigma.pack(fill=tk.X)
+        tk.Button(container, text="Blur: Gaussian", 
+                  command=self.apply_gaussian_filter,
+                  bg='#27ae60', fg='white', font=('Segoe UI', 10, 'bold'),
+                  relief=tk.FLAT, cursor='hand2', activebackground='#1e8449').pack(pady=6)
+
+        self.create_section_header(container, "Non-Linear Filters")
+        tk.Label(container, text="Median Kernel (odd):", bg='#353535', fg='#cccccc',
+                 font=('Segoe UI', 9)).pack(anchor=tk.W)
+        self.median_kernel = tk.Scale(container, from_=3, to=21, orient=tk.HORIZONTAL,
+                                      resolution=2, bg='#353535', fg='#cccccc',
+                                      troughcolor='#2b2b2b', highlightthickness=0,
+                                      activebackground='#4a90e2', font=('Segoe UI', 8))
+        self.median_kernel.set(5)
+        self.median_kernel.pack(fill=tk.X, pady=(0,8))
+        tk.Button(container, text="Noise: Median Filter", 
+                  command=self.apply_median_filter,
+                  bg='#d35400', fg='white', font=('Segoe UI', 10, 'bold'),
+                  relief=tk.FLAT, cursor='hand2', activebackground='#c0392b').pack(pady=6)
+
+        self.create_section_header(container, "Sharpening")
+        tk.Button(container, text="Sharpen: Laplacian", 
+                  command=self.apply_sharpen_laplacian,
+                  bg='#e74c3c', fg='white', font=('Segoe UI', 10, 'bold'),
+                  relief=tk.FLAT, cursor='hand2', activebackground='#c0392b').pack(pady=5)
+        tk.Button(container, text="Sharpen: Unsharp Mask", 
+                  command=self.apply_unsharp_mask,
+                  bg='#e74c3c', fg='white', font=('Segoe UI', 10, 'bold'),
+                  relief=tk.FLAT, cursor='hand2', activebackground='#c0392b').pack(pady=5)
+
+    # ========== FREQUENCY DOMAIN ==========
+    def create_frequency_panel(self, parent):
+        parent.configure(bg='#353535')
+        container = tk.Frame(parent, bg='#353535')
+        container.pack(fill=tk.BOTH, expand=True, padx=15, pady=15)
+        
+        self.create_section_header(container, "Fourier Spectrum")
+        tk.Button(container, text="🔍 Show FFT Magnitude", 
+                  command=self.show_fft_magnitude,
+                  bg='#3498db', fg='white', font=('Segoe UI', 10, 'bold'),
+                  relief=tk.FLAT, cursor='hand2', activebackground='#2980b9').pack(pady=6)
+
+        self.create_section_header(container, "Ideal Filters")
+        
+        tk.Label(container, text="Cutoff Radius (D₀):", bg='#353535', fg='#cccccc',
+                 font=('Segoe UI', 9)).pack(anchor=tk.W, pady=(10,0))
+        self.cutoff_scale = tk.Scale(container, from_=1, to=150, orient=tk.HORIZONTAL,
+                                     resolution=1, bg='#353535', fg='#cccccc',
+                                     troughcolor='#2b2b2b', highlightthickness=0,
+                                     activebackground='#4a90e2', font=('Segoe UI', 8))
+        self.cutoff_scale.set(30)
+        self.cutoff_scale.pack(fill=tk.X, pady=(0,10))
+        
+        tk.Button(container, text="Blur: Ideal LPF", 
+                  command=self.apply_ideal_lowpass,
+                  bg='#27ae60', fg='white', font=('Segoe UI', 10, 'bold'),
+                  relief=tk.FLAT, cursor='hand2', activebackground='#1e8449').pack(pady=5)
+        tk.Button(container, text="Sharpen: Ideal HPF", 
+                  command=self.apply_ideal_highpass,
+                  bg='#e74c3c', fg='white', font=('Segoe UI', 10, 'bold'),
+                  relief=tk.FLAT, cursor='hand2', activebackground='#c0392b').pack(pady=5)
+        
+        tk.Label(container, text="Note: Works on grayscale.\nSelection ignored.",
+                 bg='#353535', fg='#bbbbbb', font=('Segoe UI', 8), justify=tk.CENTER).pack(pady=(15,0))
+
+    # ========== SEGMENTATION ==========
+    def create_segmentation_panel(self, parent):
+        parent.configure(bg='#353535')
+        container = tk.Frame(parent, bg='#353535')
+        container.pack(fill=tk.BOTH, expand=True, padx=15, pady=15)
+        
+        self.create_section_header(container, "Thresholding")
+        
+        # Global Threshold
+        thresh_frame = tk.Frame(container, bg='#353535')
+        thresh_frame.pack(fill=tk.X, pady=5)
+        tk.Label(thresh_frame, text="Global Threshold:", bg='#353535', fg='#cccccc',
+                 font=('Segoe UI', 9)).pack(anchor=tk.W)
+        self.global_thresh = tk.Scale(thresh_frame, from_=0, to=255, orient=tk.HORIZONTAL,
+                                     resolution=1, bg='#353535', fg='#cccccc',
+                                     troughcolor='#2b2b2b', highlightthickness=0,
+                                     activebackground='#4a90e2', font=('Segoe UI', 8))
+        self.global_thresh.set(127)
+        self.global_thresh.pack(fill=tk.X)
+        tk.Button(container, text="RGBO: Global Threshold", 
+                  command=self.apply_global_threshold,
+                  bg='#2c3e50', fg='white', font=('Segoe UI', 10, 'bold'),
+                  relief=tk.FLAT, cursor='hand2', activebackground='#1a252f').pack(pady=5)
+
+        # Otsu (reuse existing)
+        tk.Button(container, text="RGBO: Otsu Threshold", 
+                  command=self.apply_otsu_threshold,
+                  bg='#2c3e50', fg='white', font=('Segoe UI', 10, 'bold'),
+                  relief=tk.FLAT, cursor='hand2', activebackground='#1a252f').pack(pady=5)
+
+        # Adaptive Threshold
+        self.adaptive_method = tk.StringVar(value="mean")
+        rb_style = {'bg': '#353535', 'fg': '#cccccc', 'selectcolor': '#2b2b2b',
+                    'font': ('Segoe UI', 9)}
+        tk.Radiobutton(container, text="Adaptive: Mean", variable=self.adaptive_method,
+                       value="mean", **rb_style).pack(anchor=tk.W, pady=2)
+        tk.Radiobutton(container, text="Adaptive: Gaussian", variable=self.adaptive_method,
+                       value="gaussian", **rb_style).pack(anchor=tk.W, pady=2)
+        
+        tk.Label(container, text="Block Size (odd):", bg='#353535', fg='#cccccc',
+                 font=('Segoe UI', 9)).pack(anchor=tk.W, pady=(8,0))
+        self.block_size = tk.Scale(container, from_=3, to=51, orient=tk.HORIZONTAL,
+                                   resolution=2, bg='#353535', fg='#cccccc',
+                                   troughcolor='#2b2b2b', highlightthickness=0,
+                                   activebackground='#4a90e2', font=('Segoe UI', 8))
+        self.block_size.set(11)
+        self.block_size.pack(fill=tk.X, pady=(0,8))
+        
+        tk.Button(container, text="RGBO: Adaptive Threshold", 
+                  command=self.apply_adaptive_threshold,
+                  bg='#2c3e50', fg='white', font=('Segoe UI', 10, 'bold'),
+                  relief=tk.FLAT, cursor='hand2', activebackground='#1a252f').pack(pady=5)
+
+        self.create_section_header(container, "Advanced Segmentation")
+        tk.Button(container, text="🔍 Watershed Segmentation", 
+                  command=self.apply_watershed_segmentation,
+                  bg='#8e44ad', fg='white', font=('Segoe UI', 10, 'bold'),
+                  relief=tk.FLAT, cursor='hand2', activebackground='#7d3c98').pack(pady=8)
+        
+        tk.Label(container, text="Note: Watershed works on\nentire grayscale image.",
+                 bg='#353535', fg='#bbbbbb', font=('Segoe UI', 8), justify=tk.CENTER).pack(pady=(10,0))
+
     def update_brightness_label(self, value):
         self.brightness_value.config(text=f"{int(float(value))}")
     def update_contrast_label(self, value):
         self.contrast_value.config(text=f"{float(value):.1f}")
-    
-    # ========== Selection Functions ==========
+
+    # ========== SELECTION FUNCTIONS ==========
     def toggle_selection_mode(self):
         self.selection_active = not self.selection_active
         if self.selection_active:
@@ -444,8 +629,8 @@ class ImageEditor:
         result = self.current_image.copy()
         result[y1:y2, x1:x2] = processed_region
         return result
-    
-    # ========== File Operations ==========
+
+    # ========== FILE OPERATIONS ==========
     def open_image(self):
         file_path = filedialog.askopenfilename(
             title="Select Image",
@@ -469,7 +654,6 @@ class ImageEditor:
                 self.update_status(f"✓ Loaded: {filename}")
             else:
                 messagebox.showerror("Error", "Failed to load image")
-    
     def save_image(self):
         if self.current_image is None:
             messagebox.showwarning("Warning", "No image to save")
@@ -484,8 +668,8 @@ class ImageEditor:
             filename = file_path.split('/')[-1]
             self.update_status(f"💾 Saved: {filename}")
             messagebox.showinfo("Success", f"Image saved successfully!\n\n{filename}")
-    
-    # ========== History Management ==========
+
+    # ========== HISTORY ==========
     def add_to_history(self):
         self.history = self.history[:self.history_index + 1]
         self.history.append(self.current_image.copy())
@@ -520,51 +704,42 @@ class ImageEditor:
             self.update_status("🔄 Image reset to original")
         else:
             messagebox.showwarning("Warning", "No image loaded")
-    
-    # ========== Image Processing Functions ==========
+
+    # ========== ORIGINAL FILTERS ==========
     def apply_gaussian_blur(self):
         if self.current_image is None:
             messagebox.showwarning("Warning", "Please load an image first")
             return
         kernel_size = self.blur_scale.get()
-        if kernel_size % 2 == 0:
-            kernel_size += 1
-        def blur_operation(img):
-            return cv2.GaussianBlur(img, (kernel_size, kernel_size), 0)
+        if kernel_size % 2 == 0: kernel_size += 1
+        def blur_operation(img): return cv2.GaussianBlur(img, (kernel_size, kernel_size), 0)
         self.current_image = self.apply_to_selection(blur_operation)
         self.add_to_history()
         self.display_image()
         region_text = " to selected region" if self.selection_coords else ""
         self.update_status(f"✓ Gaussian Blur applied{region_text} (kernel: {kernel_size}x{kernel_size})")
     def apply_median_blur(self):
-        if self.current_image is None:
-            return
+        if self.current_image is None: return
         kernel_size = self.blur_scale.get()
-        if kernel_size % 2 == 0:
-            kernel_size += 1
-        def blur_operation(img):
-            return cv2.medianBlur(img, kernel_size)
+        if kernel_size % 2 == 0: kernel_size += 1
+        def blur_operation(img): return cv2.medianBlur(img, kernel_size)
         self.current_image = self.apply_to_selection(blur_operation)
         self.add_to_history()
         self.display_image()
         region_text = " to selected region" if self.selection_coords else ""
         self.update_status(f"✓ Median Blur applied{region_text} (kernel: {kernel_size})")
     def apply_mean_blur(self):
-        if self.current_image is None:
-            return
+        if self.current_image is None: return
         kernel_size = self.blur_scale.get()
-        if kernel_size % 2 == 0:
-            kernel_size += 1
-        def blur_operation(img):
-            return cv2.blur(img, (kernel_size, kernel_size))
+        if kernel_size % 2 == 0: kernel_size += 1
+        def blur_operation(img): return cv2.blur(img, (kernel_size, kernel_size))
         self.current_image = self.apply_to_selection(blur_operation)
         self.add_to_history()
         self.display_image()
         region_text = " to selected region" if self.selection_coords else ""
         self.update_status(f"✓ Mean Blur applied{region_text} (kernel: {kernel_size}x{kernel_size})")
     def apply_brightness_contrast(self):
-        if self.current_image is None:
-            return
+        if self.current_image is None: return
         brightness = self.brightness_scale.get()
         contrast = self.contrast_scale.get()
         def adjust_operation(img):
@@ -572,57 +747,39 @@ class ImageEditor:
             scaled = cv2.multiply(img_float, contrast)
             adjusted = cv2.add(scaled, brightness)
             clipped = np.clip(adjusted, 0, 255)
-            result = clipped.astype(np.uint8)
-            return result
+            return clipped.astype(np.uint8)
         self.current_image = self.apply_to_selection(adjust_operation)
         self.add_to_history()
         self.display_image()
         region_text = " to selected region" if self.selection_coords else ""
         self.update_status(f"Adjusted{region_text}: Brightness={brightness}, Contrast={contrast}")
-
-    # ========== Laplacian Edge ==========
     def apply_laplacian_edge(self):
         if self.current_image is None:
             messagebox.showwarning("Warning", "Please load an image first")
             return
-
         def edge_operation(img):
-            if len(img.shape) == 3:
-                gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            else:
-                gray = img
+            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) if len(img.shape) == 3 else img
             lap = cv2.Laplacian(gray, cv2.CV_16S, ksize=3)
             lap = cv2.convertScaleAbs(lap)
             return cv2.cvtColor(lap, cv2.COLOR_GRAY2BGR)
-
         self.current_image = self.apply_to_selection(edge_operation)
         self.add_to_history()
         self.display_image()
         region_text = " to selected region" if self.selection_coords else ""
         self.update_status(f"✓ Laplacian Edge applied{region_text}")
-
-    # ========== Otsu Threshold ==========
     def apply_otsu_threshold(self):
         if self.current_image is None:
             messagebox.showwarning("Warning", "Please load an image first")
             return
-
         def threshold_operation(img):
-            if len(img.shape) == 3:
-                gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            else:
-                gray = img
+            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) if len(img.shape) == 3 else img
             _, binary = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
             return cv2.cvtColor(binary, cv2.COLOR_GRAY2BGR)
-
         self.current_image = self.apply_to_selection(threshold_operation)
         self.add_to_history()
         self.display_image()
-        
         region_text = " to selected region" if self.selection_coords else ""
         self.update_status(f"✓ Otsu Threshold applied{region_text}")
-
-    # ========== LOGICAL OPERATIONS ==========
     def load_second_image(self):
         if self.current_image is None:
             messagebox.showwarning("Warning", "Please load a main image first!")
@@ -644,7 +801,6 @@ class ImageEditor:
                 messagebox.showerror("Error", "Failed to load second image")
                 self.second_image = None
                 self.second_img_label.config(text="Load failed")
-
     def apply_logic_operation(self, op):
         if self.current_image is None:
             messagebox.showwarning("Warning", "No main image loaded")
@@ -670,7 +826,256 @@ class ImageEditor:
             self.update_status(f"✓ {msg}")
         except Exception as e:
             messagebox.showerror("Error", f"Logical operation failed:\n{str(e)}")
-    
+
+    # ========== HALFTONING METHODS ==========
+    def apply_halftoning(self):
+        if self.current_image is None:
+            messagebox.showwarning("Warning", "Please load an image first")
+            return
+        if len(self.current_image.shape) == 3:
+            gray = cv2.cvtColor(self.current_image, cv2.COLOR_BGR2GRAY)
+        else:
+            gray = self.current_image.copy()
+        method = self.halftone_method.get()
+        if method == "patterning":
+            result = self._apply_patterning(gray)
+            msg = "Patterning halftoning applied"
+        elif method == "dithering":
+            result = self._apply_dithering(gray)
+            msg = "Dithering halftoning applied"
+        else:
+            return
+        self.current_image = cv2.cvtColor(result, cv2.COLOR_GRAY2BGR)
+        self.add_to_history()
+        self.display_image()
+        self.update_status(f"✓ {msg}")
+    def _apply_patterning(self, gray_img):
+        h, w = gray_img.shape
+        fonts = [
+            np.array([[0, 0], [0, 0]], dtype=np.uint8),
+            np.array([[0, 1], [0, 0]], dtype=np.uint8),
+            np.array([[0, 1], [1, 0]], dtype=np.uint8),
+            np.array([[1, 1], [0, 1]], dtype=np.uint8),
+            np.array([[1, 1], [1, 1]], dtype=np.uint8),
+        ]
+        levels = np.digitize(gray_img, bins=[51, 102, 153, 204], right=False)
+        out = np.zeros((h * 2, w * 2), dtype=np.uint8)
+        for i in range(h):
+            for j in range(w):
+                lvl = levels[i, j]
+                out[i*2:(i+1)*2, j*2:(j+1)*2] = fonts[lvl]
+        return out * 255
+    def _apply_dithering(self, gray_img):
+        dither_matrix = np.array([[0, 128], [192, 64]], dtype=np.uint8)
+        h, w = gray_img.shape
+        tiled = np.tile(dither_matrix, (int(np.ceil(h/2)), int(np.ceil(w/2))))
+        threshold_map = tiled[:h, :w]
+        binary = (gray_img > threshold_map).astype(np.uint8) * 255
+        return binary
+
+    # ========== NEIGHBORHOOD METHODS ==========
+    def apply_mean_filter(self):
+        if self.current_image is None:
+            messagebox.showwarning("Warning", "Please load an image first")
+            return
+        k = int(self.mean_kernel.get())
+        if k % 2 == 0: k += 1
+        def op(img): return cv2.blur(img, (k, k))
+        self.current_image = self.apply_to_selection(op)
+        self.add_to_history()
+        self.display_image()
+        region = " to selection" if self.selection_coords else ""
+        self.update_status(f"✓ Mean blur ({k}×{k}) applied{region}")
+
+    def apply_gaussian_filter(self):
+        if self.current_image is None:
+            messagebox.showwarning("Warning", "Please load an image first")
+            return
+        k = int(self.gauss_kernel.get())
+        if k % 2 == 0: k += 1
+        sigma = float(self.gauss_sigma.get())
+        def op(img): return cv2.GaussianBlur(img, (k, k), sigmaX=sigma, sigmaY=sigma)
+        self.current_image = self.apply_to_selection(op)
+        self.add_to_history()
+        self.display_image()
+        region = " to selection" if self.selection_coords else ""
+        self.update_status(f"✓ Gaussian blur ({k}×{k}, σ={sigma}) applied{region}")
+
+    def apply_median_filter(self):
+        if self.current_image is None:
+            messagebox.showwarning("Warning", "Please load an image first")
+            return
+        k = int(self.median_kernel.get())
+        if k % 2 == 0: k += 1
+        def op(img): return cv2.medianBlur(img, k)
+        self.current_image = self.apply_to_selection(op)
+        self.add_to_history()
+        self.display_image()
+        region = " to selection" if self.selection_coords else ""
+        self.update_status(f"✓ Median filter ({k}×{k}) applied{region}")
+
+    def apply_sharpen_laplacian(self):
+        if self.current_image is None:
+            messagebox.showwarning("Warning", "Please load an image first")
+            return
+        def op(img):
+            if len(img.shape) == 3:
+                gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+                lap = cv2.Laplacian(gray, cv2.CV_16S, ksize=3)
+                lap = cv2.convertScaleAbs(lap)
+                sharpened_gray = cv2.addWeighted(gray, 1.5, lap, -0.5, 0)
+                return cv2.cvtColor(sharpened_gray, cv2.COLOR_GRAY2BGR)
+            else:
+                lap = cv2.Laplacian(img, cv2.CV_16S, ksize=3)
+                lap = cv2.convertScaleAbs(lap)
+                return cv2.addWeighted(img, 1.5, lap, -0.5, 0)
+        self.current_image = self.apply_to_selection(op)
+        self.add_to_history()
+        self.display_image()
+        region = " to selection" if self.selection_coords else ""
+        self.update_status(f"✓ Laplacian sharpening applied{region}")
+
+    def apply_unsharp_mask(self):
+        if self.current_image is None:
+            messagebox.showwarning("Warning", "Please load an image first")
+            return
+        def op(img):
+            blurred = cv2.GaussianBlur(img, (0, 0), sigmaX=1.0)
+            sharpened = cv2.addWeighted(img, 1.5, blurred, -0.5, 0)
+            return np.clip(sharpened, 0, 255).astype(np.uint8)
+        self.current_image = self.apply_to_selection(op)
+        self.add_to_history()
+        self.display_image()
+        region = " to selection" if self.selection_coords else ""
+        self.update_status(f"✓ Unsharp masking applied{region}")
+
+    # ========== FREQUENCY DOMAIN METHODS ==========
+    def show_fft_magnitude(self):
+        if self.current_image is None:
+            messagebox.showwarning("Warning", "Please load an image first")
+            return
+        if len(self.current_image.shape) == 3:
+            gray = cv2.cvtColor(self.current_image, cv2.COLOR_BGR2GRAY)
+        else:
+            gray = self.current_image.copy()
+        f = np.fft.fft2(gray.astype(np.float32))
+        fshift = np.fft.fftshift(f)
+        magnitude = np.log(1 + np.abs(fshift))
+        magnitude = ((magnitude - magnitude.min()) / (magnitude.max() - magnitude.min()) * 255).astype(np.uint8)
+        cv2.imshow("FFT Magnitude Spectrum", magnitude)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+
+    def apply_ideal_lowpass(self):
+        self._apply_freq_filter('lowpass')
+
+    def apply_ideal_highpass(self):
+        self._apply_freq_filter('highpass')
+
+    def _apply_freq_filter(self, filter_type):
+        if self.current_image is None:
+            messagebox.showwarning("Warning", "Please load an image first")
+            return
+        if self.selection_coords is not None:
+            messagebox.showinfo("Info", "Frequency filters ignore selection.\nApplying to entire image.")
+        if len(self.current_image.shape) == 3:
+            gray = cv2.cvtColor(self.current_image, cv2.COLOR_BGR2GRAY)
+        else:
+            gray = self.current_image.copy().astype(np.float32)
+        D0 = int(self.cutoff_scale.get())
+        rows, cols = gray.shape
+        crow, ccol = rows // 2, cols // 2
+        f = np.fft.fft2(gray)
+        fshift = np.fft.fftshift(f)
+        mask = np.zeros((rows, cols), dtype=np.float32)
+        for i in range(rows):
+            for j in range(cols):
+                D = np.sqrt((i - crow)**2 + (j - ccol)**2)
+                if filter_type == 'lowpass':
+                    if D <= D0:
+                        mask[i, j] = 1
+                else:
+                    if D > D0:
+                        mask[i, j] = 1
+        f_filtered = fshift * mask
+        f_ishift = np.fft.ifftshift(f_filtered)
+        img_back = np.fft.ifft2(f_ishift)
+        img_back = np.abs(img_back)
+        img_back = np.clip(img_back, 0, 255).astype(np.uint8)
+        self.current_image = cv2.cvtColor(img_back, cv2.COLOR_GRAY2BGR)
+        self.add_to_history()
+        self.display_image()
+        self.update_status(f"✓ Ideal {'LPF' if filter_type == 'lowpass' else 'HPF'} applied (D₀={D0})")
+
+    # ========== SEGMENTATION METHODS ==========
+    def apply_global_threshold(self):
+        if self.current_image is None:
+            messagebox.showwarning("Warning", "Please load an image first")
+            return
+        if len(self.current_image.shape) == 3:
+            gray = cv2.cvtColor(self.current_image, cv2.COLOR_BGR2GRAY)
+        else:
+            gray = self.current_image.copy()
+        thresh_val = int(self.global_thresh.get())
+        _, binary = cv2.threshold(gray, thresh_val, 255, cv2.THRESH_BINARY)
+        self.current_image = cv2.cvtColor(binary, cv2.COLOR_GRAY2BGR)
+        self.add_to_history()
+        self.display_image()
+        self.update_status(f"✓ Global threshold applied (T={thresh_val})")
+
+    def apply_adaptive_threshold(self):
+        if self.current_image is None:
+            messagebox.showwarning("Warning", "Please load an image first")
+            return
+        if len(self.current_image.shape) == 3:
+            gray = cv2.cvtColor(self.current_image, cv2.COLOR_BGR2GRAY)
+        else:
+            gray = self.current_image.copy()
+        block = int(self.block_size.get())
+        if block % 2 == 0:
+            block += 1
+        c = 2
+        if self.adaptive_method.get() == "gaussian":
+            binary = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+                                          cv2.THRESH_BINARY, block, c)
+        else:
+            binary = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
+                                          cv2.THRESH_BINARY, block, c)
+        self.current_image = cv2.cvtColor(binary, cv2.COLOR_GRAY2BGR)
+        self.add_to_history()
+        self.display_image()
+        method_name = "Gaussian" if self.adaptive_method.get() == "gaussian" else "Mean"
+        self.update_status(f"✓ Adaptive {method_name} threshold applied (block={block})")
+
+    def apply_watershed_segmentation(self):
+        if self.current_image is None:
+            messagebox.showwarning("Warning", "Please load an image first")
+            return
+        if len(self.current_image.shape) == 3:
+            img = self.current_image.copy()
+            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        else:
+            img = cv2.cvtColor(self.current_image, cv2.COLOR_GRAY2BGR)
+            gray = self.current_image.copy()
+
+        _, thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+        kernel = np.ones((3,3), np.uint8)
+        opening = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel, iterations=2)
+        sure_bg = cv2.dilate(opening, kernel, iterations=3)
+        dist_transform = cv2.distanceTransform(opening, cv2.DIST_L2, 5)
+        _, sure_fg = cv2.threshold(dist_transform, 0.7 * dist_transform.max(), 255, 0)
+        sure_fg = np.uint8(sure_fg)
+        unknown = cv2.subtract(sure_bg, sure_fg)
+        _, markers = cv2.connectedComponents(sure_fg)
+        markers = markers + 1
+        markers[unknown == 255] = 0
+        markers = cv2.watershed(img, markers)
+        img[markers == -1] = [0, 0, 255]
+        self.current_image = img
+        self.add_to_history()
+        self.display_image()
+        self.update_status("✓ Watershed segmentation applied")
+
     # ========== HISTOGRAM ==========
     def update_histogram(self):
         if self.current_image is None:
@@ -695,10 +1100,8 @@ class ImageEditor:
 
         self.hist_ax.clear()
         self.hist_ax.set_facecolor('#3c3c3c')
-        self.hist_ax.spines['top'].set_color('#555555')
-        self.hist_ax.spines['bottom'].set_color('#555555')
-        self.hist_ax.spines['left'].set_color('#555555')
-        self.hist_ax.spines['right'].set_color('#555555')
+        for spine in self.hist_ax.spines.values():
+            spine.set_color('#555555')
         self.hist_ax.tick_params(colors='white', labelsize=8)
         self.hist_ax.grid(True, color='#444444', linestyle='--', linewidth=0.5)
         self.hist_ax.set_xlim([0, 256])
@@ -723,34 +1126,27 @@ class ImageEditor:
         self.hist_fig.suptitle("RGB Histogram", color='white', fontsize=10)
         self.hist_canvas_agg.draw()
 
-    # ========== Display Functions ==========
+    # ========== DISPLAY ==========
     def display_image(self):
         if self.current_image is None:
             return
-        
         canvas_width = self.canvas.winfo_width()
         canvas_height = self.canvas.winfo_height()
-        
         if canvas_width <= 1 or canvas_height <= 1:
             canvas_width = 800
             canvas_height = 600
-        
         img_rgb = cv2.cvtColor(self.current_image, cv2.COLOR_BGR2RGB)
         h, w = img_rgb.shape[:2]
-        
         scale = min(canvas_width/w, canvas_height/h, 1.0)
         new_w = int(w * scale)
         new_h = int(h * scale)
-        
         img_resized = cv2.resize(img_rgb, (new_w, new_h), interpolation=cv2.INTER_AREA)
         img_pil = Image.fromarray(img_resized)
         self.photo = ImageTk.PhotoImage(img_pil)
-        
         self.canvas.delete("all")
         x = (canvas_width - new_w) // 2
         y = (canvas_height - new_h) // 2
         self.canvas.create_image(x, y, anchor=tk.NW, image=self.photo)
-        
         if self.selection_rect and self.selection_start and self.selection_end:
             x1, y1 = self.selection_start
             x2, y2 = self.selection_end
@@ -760,7 +1156,6 @@ class ImageEditor:
                 width=2,
                 dash=(5, 5)
             )
-        
         self.update_histogram()
     
     def update_status(self, message):
@@ -770,14 +1165,12 @@ class ImageEditor:
         else:
             self.status_bar.config(text=message)
 
-# ========== Main Application ==========
+# ========== MAIN ==========
 if __name__ == "__main__":
     root = tk.Tk()
     app = ImageEditor(root)
-    
     root.bind('<Control-o>', lambda e: app.open_image())
     root.bind('<Control-s>', lambda e: app.save_image())
     root.bind('<Control-z>', lambda e: app.undo())
     root.bind('<Control-y>', lambda e: app.redo())
-    
     root.mainloop()
