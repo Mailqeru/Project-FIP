@@ -137,23 +137,22 @@ class ImageEditor:
         notebook = ttk.Notebook(left_panel)
         notebook.pack(fill=tk.BOTH, expand=True, padx=0, pady=0)
         
-        # Existing Tabs
-        filters_frame = tk.Frame(notebook, bg='#353535')
-        notebook.add(filters_frame, text="Filters")
-        self.create_filters_panel(filters_frame)
-        
+        # Adjustments Tab
         adjustments_frame = tk.Frame(notebook, bg='#353535')
         notebook.add(adjustments_frame, text="Adjustments")
         self.create_adjustments_panel(adjustments_frame)
         
+        # Edge Detection Tab
         edge_frame = tk.Frame(notebook, bg='#353535')
         notebook.add(edge_frame, text="Edge Detection")
         self.create_edge_panel(edge_frame)
         
+        # Thresholding Tab
         thresh_frame = tk.Frame(notebook, bg='#353535')
         notebook.add(thresh_frame, text="Thresholding")
         self.create_threshold_panel(thresh_frame)
         
+        # Logic Operations Tab
         logic_frame = tk.Frame(notebook, bg='#353535')
         notebook.add(logic_frame, text="Logic Operations")
         self.create_logic_panel(logic_frame)
@@ -173,7 +172,7 @@ class ImageEditor:
         notebook.add(freq_frame, text="Frequency")
         self.create_frequency_panel(freq_frame)
         
-        # Segmentation Tab (NEW)
+        # Segmentation Tab
         seg_frame = tk.Frame(notebook, bg='#353535')
         notebook.add(seg_frame, text="Segmentation")
         self.create_segmentation_panel(seg_frame)
@@ -237,36 +236,14 @@ class ImageEditor:
         tk.Label(header_frame, text=text, bg='#2b2b2b', fg='#ffcc00',
                  font=('Segoe UI', 10, 'bold')).pack(pady=6, padx=10, anchor=tk.W)
 
-    # ========== EXISTING PANELS ==========
-    def create_filters_panel(self, parent):
-        parent.configure(bg='#353535')
-        container = tk.Frame(parent, bg='#353535')
-        container.pack(fill=tk.BOTH, expand=True, padx=15, pady=15)
-        self.create_section_header(container, "Blur Filters")
-        btn_style = {'bg': '#4a90e2', 'fg': 'white', 'font': ('Segoe UI', 10),
-                     'relief': tk.FLAT, 'cursor': 'hand2', 'activebackground': '#357abd'}
-        tk.Button(container, text="Gaussian Blur", command=self.apply_gaussian_blur,
-                 width=22, **btn_style).pack(pady=5)
-        tk.Button(container, text="Median Blur", command=self.apply_median_blur,
-                 width=22, **btn_style).pack(pady=5)
-        tk.Button(container, text="Mean (Box) Blur", command=self.apply_mean_blur,
-                 width=22, **btn_style).pack(pady=5)
-        slider_frame = tk.Frame(container, bg='#353535')
-        slider_frame.pack(pady=10, fill=tk.X)
-        tk.Label(slider_frame, text="Kernel Size:", bg='#353535', 
-                fg='#cccccc', font=('Segoe UI', 9)).pack(anchor=tk.W)
-        self.blur_scale = tk.Scale(slider_frame, from_=1, to=51, orient=tk.HORIZONTAL,
-                                   resolution=2, bg='#353535', fg='#cccccc',
-                                   troughcolor='#2b2b2b', highlightthickness=0,
-                                   activebackground='#4a90e2', font=('Segoe UI', 8))
-        self.blur_scale.set(5)
-        self.blur_scale.pack(fill=tk.X)
-
+    # ========== ADJUSTMENTS ==========
     def create_adjustments_panel(self, parent):
         parent.configure(bg='#353535')
         container = tk.Frame(parent, bg='#353535')
         container.pack(fill=tk.BOTH, expand=True, padx=15, pady=15)
-        self.create_section_header(container, "Brightness")
+        self.create_section_header(container, "Brightness & Contrast")
+        tk.Label(container, text="Adjust overall lightness/darkness\nand dynamic range of pixels.",
+                 bg='#353535', fg='#bbbbbb', font=('Segoe UI', 8), justify=tk.LEFT).pack(anchor=tk.W, pady=(0,10))
         brightness_frame = tk.Frame(container, bg='#353535')
         brightness_frame.pack(pady=5, fill=tk.X)
         self.brightness_value = tk.Label(brightness_frame, text="0", 
@@ -280,7 +257,6 @@ class ImageEditor:
                                         showvalue=0, command=self.update_brightness_label)
         self.brightness_scale.set(0)
         self.brightness_scale.pack(fill=tk.X)
-        self.create_section_header(container, "Contrast")
         contrast_frame = tk.Frame(container, bg='#353535')
         contrast_frame.pack(pady=5, fill=tk.X)
         self.contrast_value = tk.Label(contrast_frame, text="1.0", 
@@ -301,36 +277,41 @@ class ImageEditor:
         tk.Button(container, text="✓ Apply Adjustments", 
                  command=self.apply_brightness_contrast,
                  width=20, height=2, **btn_style).pack(pady=10)
-    
+
+    # ========== EDGE DETECTION ==========
     def create_edge_panel(self, parent):
         parent.configure(bg='#353535')
         container = tk.Frame(parent, bg='#353535')
         container.pack(fill=tk.BOTH, expand=True, padx=15, pady=15)
         self.create_section_header(container, "Laplacian Edge")
+        tk.Label(container, text="Detects edges using 2nd derivative.\nHighlights rapid intensity changes.",
+                 bg='#353535', fg='#bbbbbb', font=('Segoe UI', 8), justify=tk.LEFT).pack(anchor=tk.W, pady=(0,10))
         edge_btn_style = {'bg': '#d35400', 'fg': 'white', 'font': ('Segoe UI', 10),
                          'relief': tk.FLAT, 'cursor': 'hand2', 'activebackground': '#c0392b'}
         tk.Button(container, text="Apply Laplacian", command=self.apply_laplacian_edge,
                  width=22, **edge_btn_style).pack(pady=5)
-        tk.Label(container, text="Detects edges using 2nd derivative",
-                 bg='#353535', fg='#bbbbbb', font=('Segoe UI', 8), justify=tk.CENTER).pack(pady=(10,0))
-    
+
+    # ========== THRESHOLDING ==========
     def create_threshold_panel(self, parent):
         parent.configure(bg='#353535')
         container = tk.Frame(parent, bg='#353535')
         container.pack(fill=tk.BOTH, expand=True, padx=15, pady=15)
         self.create_section_header(container, "Otsu Threshold")
+        tk.Label(container, text="Automatically finds optimal threshold\nfor bimodal histograms. Used in segmentation.",
+                 bg='#353535', fg='#bbbbbb', font=('Segoe UI', 8), justify=tk.LEFT).pack(anchor=tk.W, pady=(0,10))
         thresh_btn_style = {'bg': '#2c3e50', 'fg': 'white', 'font': ('Segoe UI', 10),
                            'relief': tk.FLAT, 'cursor': 'hand2', 'activebackground': '#1a252f'}
         tk.Button(container, text="RGBO: Otsu Threshold", command=self.apply_otsu_threshold,
                  width=22, **thresh_btn_style).pack(pady=5)
-        tk.Label(container, text="Automatic binary segmentation\nBest threshold chosen by algorithm",
-                 bg='#353535', fg='#bbbbbb', font=('Segoe UI', 8), justify=tk.CENTER).pack(pady=(10,0))
-    
+
+    # ========== LOGIC OPERATIONS ==========
     def create_logic_panel(self, parent):
         parent.configure(bg='#353535')
         container = tk.Frame(parent, bg='#353535')
         container.pack(fill=tk.BOTH, expand=True, padx=15, pady=15)
         self.create_section_header(container, "Second Image")
+        tk.Label(container, text="Load a second image for bitwise operations\n(e.g., masking, combining regions).",
+                 bg='#353535', fg='#bbbbbb', font=('Segoe UI', 8), justify=tk.LEFT).pack(anchor=tk.W, pady=(0,5))
         btn_style = {'bg': '#9b59b6', 'fg': 'white', 'font': ('Segoe UI', 10),
                      'relief': tk.FLAT, 'cursor': 'hand2', 'activebackground': '#8e44ad'}
         tk.Button(container, text="Load Second Image", 
@@ -341,6 +322,8 @@ class ImageEditor:
                                          font=('Segoe UI', 9), wraplength=200)
         self.second_img_label.pack(pady=5)
         self.create_section_status(container, "Logical Operations")
+        tk.Label(container, text="Combine images using AND, OR, XOR\nfor masking or region extraction.",
+                 bg='#353535', fg='#bbbbbb', font=('Segoe UI', 8), justify=tk.LEFT).pack(anchor=tk.W, pady=(0,5))
         logic_btn_style = {'bg': '#e67e22', 'fg': 'white', 'font': ('Segoe UI', 10),
                            'relief': tk.FLAT, 'cursor': 'hand2', 'activebackground': '#d35400'}
         tk.Button(container, text="AND", command=lambda: self.apply_logic_operation('AND'),
@@ -356,6 +339,8 @@ class ImageEditor:
         container = tk.Frame(parent, bg='#353535')
         container.pack(fill=tk.BOTH, expand=True, padx=15, pady=15)
         self.create_section_header(container, "Halftoning Methods")
+        tk.Label(container, text="Convert grayscale to binary while\npreserving perceived gray levels.\nUsed in printing (e.g., newspapers).",
+                 bg='#353535', fg='#bbbbbb', font=('Segoe UI', 8), justify=tk.LEFT).pack(anchor=tk.W, pady=(0,10))
         self.halftone_method = tk.StringVar(value="patterning")
         rb_style = {'bg': '#353535', 'fg': '#cccccc', 'selectcolor': '#2b2b2b',
                     'font': ('Segoe UI', 10)}
@@ -368,16 +353,16 @@ class ImageEditor:
         tk.Button(container, text="🎨 Apply Halftoning", 
                   command=self.apply_halftoning,
                   width=22, **btn_style).pack(pady=15)
-        tk.Label(container, text="Converts grayscale image\nto binary using halftoning",
-                 bg='#353535', fg='#bbbbbb', font=('Segoe UI', 8), justify=tk.CENTER).pack(pady=(0,10))
 
-    # ========== NEIGHBORHOOD ==========
+    # ========== NEIGHBORHOOD FILTERS ==========
     def create_neighborhood_panel(self, parent):
         parent.configure(bg='#353535')
         container = tk.Frame(parent, bg='#353535')
         container.pack(fill=tk.BOTH, expand=True, padx=15, pady=15)
         
         self.create_section_header(container, "Linear Filters")
+        tk.Label(container, text="Smooth images, reduce noise,\nor prepare for further processing.",
+                 bg='#353535', fg='#bbbbbb', font=('Segoe UI', 8), justify=tk.LEFT).pack(anchor=tk.W, pady=(0,5))
         
         mean_frame = tk.Frame(container, bg='#353535')
         mean_frame.pack(fill=tk.X, pady=5)
@@ -418,6 +403,8 @@ class ImageEditor:
                   relief=tk.FLAT, cursor='hand2', activebackground='#1e8449').pack(pady=6)
 
         self.create_section_header(container, "Non-Linear Filters")
+        tk.Label(container, text="Remove salt-and-pepper noise\nwithout blurring edges.",
+                 bg='#353535', fg='#bbbbbb', font=('Segoe UI', 8), justify=tk.LEFT).pack(anchor=tk.W, pady=(0,5))
         tk.Label(container, text="Median Kernel (odd):", bg='#353535', fg='#cccccc',
                  font=('Segoe UI', 9)).pack(anchor=tk.W)
         self.median_kernel = tk.Scale(container, from_=3, to=21, orient=tk.HORIZONTAL,
@@ -432,6 +419,8 @@ class ImageEditor:
                   relief=tk.FLAT, cursor='hand2', activebackground='#c0392b').pack(pady=6)
 
         self.create_section_header(container, "Sharpening")
+        tk.Label(container, text="Enhance edges and fine details\nusing high-pass filtering.",
+                 bg='#353535', fg='#bbbbbb', font=('Segoe UI', 8), justify=tk.LEFT).pack(anchor=tk.W, pady=(0,5))
         tk.Button(container, text="Sharpen: Laplacian", 
                   command=self.apply_sharpen_laplacian,
                   bg='#e74c3c', fg='white', font=('Segoe UI', 10, 'bold'),
@@ -448,12 +437,16 @@ class ImageEditor:
         container.pack(fill=tk.BOTH, expand=True, padx=15, pady=15)
         
         self.create_section_header(container, "Fourier Spectrum")
+        tk.Label(container, text="Visualize frequency content.\nLow frequencies at center,\nhigh at edges.",
+                 bg='#353535', fg='#bbbbbb', font=('Segoe UI', 8), justify=tk.LEFT).pack(anchor=tk.W, pady=(0,5))
         tk.Button(container, text="🔍 Show FFT Magnitude", 
                   command=self.show_fft_magnitude,
                   bg='#3498db', fg='white', font=('Segoe UI', 10, 'bold'),
                   relief=tk.FLAT, cursor='hand2', activebackground='#2980b9').pack(pady=6)
 
         self.create_section_header(container, "Ideal Filters")
+        tk.Label(container, text="Global smoothing (LPF) or\nedge enhancement (HPF)\nin frequency domain.",
+                 bg='#353535', fg='#bbbbbb', font=('Segoe UI', 8), justify=tk.LEFT).pack(anchor=tk.W, pady=(0,5))
         
         tk.Label(container, text="Cutoff Radius (D₀):", bg='#353535', fg='#cccccc',
                  font=('Segoe UI', 9)).pack(anchor=tk.W, pady=(10,0))
@@ -483,8 +476,9 @@ class ImageEditor:
         container.pack(fill=tk.BOTH, expand=True, padx=15, pady=15)
         
         self.create_section_header(container, "Thresholding")
+        tk.Label(container, text="Convert grayscale to binary\nfor object extraction or analysis.",
+                 bg='#353535', fg='#bbbbbb', font=('Segoe UI', 8), justify=tk.LEFT).pack(anchor=tk.W, pady=(0,5))
         
-        # Global Threshold
         thresh_frame = tk.Frame(container, bg='#353535')
         thresh_frame.pack(fill=tk.X, pady=5)
         tk.Label(thresh_frame, text="Global Threshold:", bg='#353535', fg='#cccccc',
@@ -500,13 +494,13 @@ class ImageEditor:
                   bg='#2c3e50', fg='white', font=('Segoe UI', 10, 'bold'),
                   relief=tk.FLAT, cursor='hand2', activebackground='#1a252f').pack(pady=5)
 
-        # Otsu (reuse existing)
         tk.Button(container, text="RGBO: Otsu Threshold", 
                   command=self.apply_otsu_threshold,
                   bg='#2c3e50', fg='white', font=('Segoe UI', 10, 'bold'),
                   relief=tk.FLAT, cursor='hand2', activebackground='#1a252f').pack(pady=5)
 
-        # Adaptive Threshold
+        tk.Label(container, text="Adaptive: handles uneven lighting\nby computing local thresholds.",
+                 bg='#353535', fg='#bbbbbb', font=('Segoe UI', 8), justify=tk.LEFT).pack(anchor=tk.W, pady=(10,5))
         self.adaptive_method = tk.StringVar(value="mean")
         rb_style = {'bg': '#353535', 'fg': '#cccccc', 'selectcolor': '#2b2b2b',
                     'font': ('Segoe UI', 9)}
@@ -530,6 +524,8 @@ class ImageEditor:
                   relief=tk.FLAT, cursor='hand2', activebackground='#1a252f').pack(pady=5)
 
         self.create_section_header(container, "Advanced Segmentation")
+        tk.Label(container, text="Separate touching objects\nusing morphological watershed.",
+                 bg='#353535', fg='#bbbbbb', font=('Segoe UI', 8), justify=tk.LEFT).pack(anchor=tk.W, pady=(0,5))
         tk.Button(container, text="🔍 Watershed Segmentation", 
                   command=self.apply_watershed_segmentation,
                   bg='#8e44ad', fg='white', font=('Segoe UI', 10, 'bold'),
